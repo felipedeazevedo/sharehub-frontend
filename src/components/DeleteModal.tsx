@@ -5,15 +5,16 @@ interface DeleteConfirmationModalProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
+    message: string;
   }
 
-const DeleteAccountModal: React.FC<DeleteConfirmationModalProps> = ({ open, onClose, onConfirm }) => {
+const DeleteModal: React.FC<DeleteConfirmationModalProps> = ({ open, onClose, onConfirm, message }) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Confirmar Deleção</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Tem certeza que encerrar sua conta?
+          {message}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -28,4 +29,4 @@ const DeleteAccountModal: React.FC<DeleteConfirmationModalProps> = ({ open, onCl
   );
 };
 
-export default DeleteAccountModal;
+export default DeleteModal;

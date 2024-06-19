@@ -12,7 +12,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SharehubIcon from './SharehubIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getUserIdFromToken, getUserNameFromToken, isUserLoggedIn } from './utils/getToken';
+import { getUserIdFromToken, getUserNameFromToken, getUserTypeFromToken, isUserLoggedIn } from './utils/getToken';
 import { Menu } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 
@@ -53,6 +53,10 @@ export default function NavBar() {
     navigate(`/`);
   };
 
+  const handleListasMaterial = () => {
+    navigate(`/listas-material`);
+  };
+
   const handleMeusAnuncios = (userId: number | null) => {
     navigate(`/anuncios/usuario/${userId}`);
   };
@@ -61,7 +65,11 @@ export default function NavBar() {
     if (!isUserLoggedIn()) {
       navigate(`/login`);
     } else {
-      navigate(`/anunciar`);
+      if (getUserTypeFromToken() === 'STUDENT') {
+        navigate(`/anunciar`);
+      } else {
+        navigate(`/criar-lista-material`);
+      }
     }
   };
 
@@ -120,7 +128,7 @@ export default function NavBar() {
                 variant="text"
                 color="info"
                 size="small"
-                onClick={() => scrollToSection('home')}
+                onClick={() => handleListasMaterial()}
               >
                 Listas de material
               </Button>
@@ -137,7 +145,7 @@ export default function NavBar() {
               Acessar conta
             </Button>}
             <Button color="primary" variant="contained" size="small" onClick={() => handleAnunciar()}>
-              Anunciar
+              {getUserTypeFromToken() === 'STUDENT' || localStorage.getItem ('accessToken') === null ? 'Anunciar' : 'Cadastrar lista'}
             </Button>
             {isUserLoggedIn() && <MenuItem>
                   <Button color="primary" variant="text" fullWidth sx={{ border: '1px solid' }} onClick={handleUserMenuOpen}>

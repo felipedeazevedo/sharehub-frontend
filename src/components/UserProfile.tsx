@@ -17,7 +17,7 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 import { useNavigate, useParams } from 'react-router-dom';
 import getLPTheme from '../getLPTheme';
-import DeleteAccountModal from './DeleteAccountModal';
+import DeleteModal from './DeleteModal';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -261,7 +261,12 @@ const UserProfile: React.FC = () => {
              </Grid>
             </Grid>
           </form>
-          <DeleteAccountModal open={isModalOpenDeletion} onClose={handleCloseModalDeletion} onConfirm={() => handleDelete()}/>
+          <DeleteModal 
+            open={isModalOpenDeletion} 
+            onClose={handleCloseModalDeletion} 
+            onConfirm={() => handleDelete()}
+            message='Tem certeza que deseja encerrar sua conta?'
+          />
         </Container>
       </Box>
       <Box sx={{ bgcolor: 'background.default' }}>
