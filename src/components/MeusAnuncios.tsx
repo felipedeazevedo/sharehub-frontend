@@ -191,7 +191,7 @@ export default function MeusAnuncios() {
           }}
         >
           {posts.length > 0 && posts.map((post: any) => (
-            <Card key={post.id} sx={{ maxWidth: 345 }}>
+            <Card key={post.id} sx={{ width: 345 }}>
               <ProductSlideShow images={post.images}/>
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">

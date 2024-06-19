@@ -58,7 +58,16 @@ export default function NavBar() {
   };
 
   const handleMeusAnuncios = (userId: number | null) => {
-    navigate(`/anuncios/usuario/${userId}`);
+    if (!isUserLoggedIn()) {
+      navigate(`/login`);
+    } else {
+      if (getUserTypeFromToken() === 'STUDENT') {
+        navigate(`/anuncios/usuario/${userId}`);
+      } else {
+        navigate(`/listas-material/usuario/${userId}`);
+      }
+    }
+    
   };
 
   const handleAnunciar = () => {
@@ -145,7 +154,7 @@ export default function NavBar() {
               Acessar conta
             </Button>}
             <Button color="primary" variant="contained" size="small" onClick={() => handleAnunciar()}>
-              {getUserTypeFromToken() === 'STUDENT' || localStorage.getItem ('accessToken') === null ? 'Anunciar' : 'Cadastrar lista'}
+              {getUserTypeFromToken() === 'STUDENT' || localStorage.getItem('accessToken') === null ? 'Anunciar' : 'Cadastrar lista'}
             </Button>
             {isUserLoggedIn() && <MenuItem>
                   <Button color="primary" variant="text" fullWidth sx={{ border: '1px solid' }} onClick={handleUserMenuOpen}>
@@ -160,7 +169,9 @@ export default function NavBar() {
                     onClose={handleUserMenuClose}
                   >
                     <MenuItem onClick={() => handleViewUser(getUserIdFromToken())}>Meu cadastro</MenuItem>
-                    <MenuItem onClick={() => handleMeusAnuncios(getUserIdFromToken())}>Meus anúncios</MenuItem>
+                    <MenuItem onClick={() => handleMeusAnuncios(getUserIdFromToken())}>
+                      {getUserTypeFromToken() === 'STUDENT' ? 'Meus anúncios' : 'Minhas listas'}
+                    </MenuItem>
                     <MenuItem onClick={() => handleLogout()}>Sair</MenuItem>
                   </Menu>
             </MenuItem>}

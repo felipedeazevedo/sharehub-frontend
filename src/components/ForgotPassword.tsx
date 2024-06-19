@@ -52,9 +52,9 @@ const ForgotPassword: React.FC = () => {
       toast.success("Email enviado")
 
       const responseData = await response.json();
-      localStorage.setItem('accessToken', responseData.accessToken);
+      localStorage.clear();
       toast.success("Email enviado")
-      navigate('/');
+      navigate('/login');
     } catch (error: any) {
       console.error('Error logging in:', error.message);
     }

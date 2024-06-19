@@ -97,7 +97,7 @@ export default function PerguntasFrequentes() {
             id="panel3d-header"
           >
             <Typography component="h3" variant="subtitle2">
-              Qual o intuito desta plataforma
+              Qual o intuito desta plataforma?
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -121,7 +121,7 @@ export default function PerguntasFrequentes() {
             id="panel4d-header"
           >
             <Typography component="h3" variant="subtitle2">
-              Preciso pagar para anunciar na plataforma
+              Preciso pagar para anunciar na plataforma?
             </Typography>
           </AccordionSummary>
           <AccordionDetails>

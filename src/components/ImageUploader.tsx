@@ -1,12 +1,21 @@
-import React, { useState, ChangeEvent } from 'react';
-import { Grid, Button } from '@mui/material';
+import React, { useState, ChangeEvent, useEffect } from 'react';
+import { Grid, Button, Typography } from '@mui/material';
 
 type ImageUploaderProps = {
   onChange: (files: File[]) => void;
+  initialImages?: File[];
 };
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onChange }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onChange, initialImages = [] }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (initialImages.length > 0) {
+      setSelectedFiles(initialImages);
+      onChange(initialImages);
+    }
+  }, [initialImages, onChange]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -14,20 +23,30 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onChange }) => {
     let selected: File[] = [];
 
     for (let i = 0; i < Math.min(files.length, 2); i++) {
+      console.log('ENTREIIII')
       selected.push(files[i]);
     }
 
-    setSelectedFiles(selected);
-
-    if (onChange) {
+    console.log('SELECTED', selected)
+    if (selected.length === 0) {
+      setError('Pelo menos uma imagem deve ser selecionada.');
+    } else {
+      setError('');
+      setSelectedFiles(selected);
       onChange(selected);
     }
   };
 
+		
   const renderSelectedFiles = () => {
     return selectedFiles.map((file, index) => (
-      <div key={index}>
-        {file.name} ({formatBytes(file.size)})
+      <div key={index} style={{ margin: '10px 0' }}>
+        <img
+          src={URL.createObjectURL(file)}
+          alt={`preview ${index}`}
+          style={{ width: '100px', height: '100px', objectFit: 'cover', marginRight: '10px' }}
+        />
+        <span>{file.name} ({formatBytes(file.size)})</span>
       </div>
     ));
   };
@@ -55,6 +74,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onChange }) => {
           Adicionar Foto(s)
         </Button>
       </label>
+      {error && (
+        <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+          {error}
+        </Typography>
+      )}
       {renderSelectedFiles()}
     </Grid>
   );

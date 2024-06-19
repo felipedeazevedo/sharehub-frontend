@@ -12,6 +12,8 @@ import EditPost from './components/EditPost';
 import NewMaterialList from './components/NewMaterialList';
 import MaterialListView from './components/MaterialListView';
 import MaterialListTable from './components/MaterialListTable';
+import MinhasListas from './components/MinhasListas';
+import EditMaterialList from './components/EditMaterialList';
 
 
 const App: React.FC = () => {
@@ -30,6 +32,8 @@ const App: React.FC = () => {
         <Route path="/criar-lista-material" element={<NewMaterialList />} />
         <Route path="/listas-material/:id" element={<MaterialListView />} />
         <Route path="/listas-material" element={<MaterialListTable />} />
+        <Route path="/listas-material/usuario/:id" element={<MinhasListas />} />
+        <Route path="/listas-material/editar/:id" element={<EditMaterialList />} />
       </Routes>
     </Router>
   );

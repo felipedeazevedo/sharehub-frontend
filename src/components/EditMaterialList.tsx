@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Grid, Button, TextField, ThemeProvider, createTheme, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent, Snackbar, Alert, Fade, IconButton } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import axios from 'axios';
 import getLPTheme from '../getLPTheme';
 import Footer from './Footer';
 import { getUserIdFromToken } from './utils/getToken';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import NavBar from './NavBar';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -32,11 +32,36 @@ const materialListInitialState: MaterialList = {
   items: [{ name: '', description: '', mandatory: false }],
 };
 
-const NewMaterialList: React.FC = () => {
+const EditMaterialList: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>(); // Assumes id is passed as a URL parameter
   const [materialList, setMaterialList] = useState<MaterialList>(materialListInitialState);
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertError, setShowAlertError] = useState(false);
+
+  useEffect(() => {
+    const fetchMaterialList = async () => {
+      try {
+        const response = await axios.get(`${apiBaseUrl}/material-lists/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+
+        // Ajustando o teacherId a partir da resposta da API
+        const fetchedMaterialList = {
+            ...response.data,
+            teacherId: response.data.teacher?.id || null
+        };
+
+        setMaterialList(fetchedMaterialList);
+      } catch (error) {
+        console.error('Error fetching material list', error);
+      }
+    };
+
+    fetchMaterialList();
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -56,7 +81,6 @@ const NewMaterialList: React.FC = () => {
       items: updatedItems,
     }));
   };
-  
 
   const addItem = () => {
     setMaterialList((prevMaterialList: MaterialList) => ({
@@ -76,13 +100,12 @@ const NewMaterialList: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${apiBaseUrl}/material-lists`, materialList, {
+      await axios.put(`${apiBaseUrl}/material-lists/${id}`, materialList, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
       setShowAlert(true);
-      setMaterialList(materialListInitialState);
     } catch (error) {
       handleShowAlertError();
     }
@@ -100,7 +123,7 @@ const NewMaterialList: React.FC = () => {
   return (
     <ThemeProvider theme={LPtheme}>
       <Box
-        id="new-material-list"
+        id="edit-material-list"
         sx={(theme) => ({
           width: '100%',
           backgroundRepeat: 'no-repeat',
@@ -121,10 +144,10 @@ const NewMaterialList: React.FC = () => {
           pb: { xs: 8, sm: 12 },
         }}>
           <Typography variant="h3" sx={{ mb: 5 }} gutterBottom>
-            Cadastro de Lista de Material
+            Editar Lista de Material
           </Typography>
           <form onSubmit={handleSubmit}>
-            <Grid container item spacing={3}>
+            <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
@@ -147,7 +170,7 @@ const NewMaterialList: React.FC = () => {
                 />
               </Grid>
               {materialList.items.map((item, index) => (
-                <Grid container spacing={2} key={index} sx={{ mt: 2 }}>
+                <Grid container item spacing={2} key={index} sx={{ mt: 2 }}>
                   <Grid item xs={12} sm={4}>
                     <TextField
                       required
@@ -195,7 +218,7 @@ const NewMaterialList: React.FC = () => {
               ))}
               <Grid container marginTop={4} xs={12} justifyContent="flex-end">
                 <Button type="submit" variant="contained" color="primary">
-                  Cadastrar Lista
+                  Salvar Alterações
                 </Button>
               </Grid>
             </Grid>
@@ -217,7 +240,7 @@ const NewMaterialList: React.FC = () => {
           variant="filled"
           sx={{ width: '100%' }}
         >
-          Lista de material cadastrada com sucesso!
+          Lista de material atualizada com sucesso!
         </Alert>
       </Snackbar>
       <Snackbar
@@ -232,11 +255,11 @@ const NewMaterialList: React.FC = () => {
           variant="filled"
           sx={{ width: '100%' }}
         >
-          Erro ao cadastrar lista de material!
+          Erro ao atualizar lista de material!
         </Alert>
       </Snackbar>
     </ThemeProvider>
   );
 };
 
-export default NewMaterialList;
+export default EditMaterialList;

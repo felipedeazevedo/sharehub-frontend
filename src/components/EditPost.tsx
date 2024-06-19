@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Grid, Button, TextField, ThemeProvider, createTheme, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent, Snackbar, Alert, Fade } from '@mui/material';
 import axios from 'axios';
 import getLPTheme from '../getLPTheme';
@@ -43,7 +43,17 @@ const EditPost: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertError, setShowAlertError] = useState(false);
   const [showAlertErrorPictures, setShowAlertErrorPictures] = useState(false);
-  const [images, setImages] = useState<File[]>(postProps.images);
+  const [images, setImages] = useState<File[]>([]);
+
+  	
+  useEffect(() => {
+    const convertedImages = postProps.images.map((image: { data: number[], type: string }) => {
+      const byteArray = new Uint8Array(image.data);
+      const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      return new File([blob], 'image.jpg', { type: 'image/jpeg' });
+    });
+    setImages(convertedImages);
+  }, [postProps.images]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,6 +62,8 @@ const EditPost: React.FC = () => {
       [name]: value,
     }));
   };
+
+  console.log('PROPS', postProps)
 
   const handleValueChange = (values: { value: string }) => {
     handleChange({
@@ -258,7 +270,7 @@ const EditPost: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <ImageUploader onChange={handleImageChange}/>
+                <ImageUploader onChange={handleImageChange} initialImages={images}/>
                 <Grid container marginTop={4} xs={12} justifyContent="flex-end">
                   <Button type="submit" variant="contained" color="primary">
                     Salvar

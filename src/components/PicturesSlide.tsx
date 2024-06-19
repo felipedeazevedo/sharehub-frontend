@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Slide from '@mui/material/Slide';
 import { Button, Box, IconButton } from '@mui/material';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import { ArrowBack, ArrowBackIos, ArrowForward, ArrowForwardIos } from '@mui/icons-material';
 
 interface ProductSlideShowProps {
     images: ImageData[];
@@ -46,11 +46,11 @@ const ProductSlideShow = ({ images }: ProductSlideShowProps) => {
           />
         </Slide>
       ))}
-      <IconButton onClick={goToPrevious} sx={{ position: 'absolute', top: '50%', left: '10px', transform: 'translateY(-50%)' }}>
-        <ArrowBack sx={{ fontSize: '1.0rem' }}/>
+      <IconButton onClick={goToPrevious} sx={{ position: 'absolute', top: '50%', left: '3px', transform: 'translateY(-50%)' }}>
+        <ArrowBackIos sx={{ fontSize: '1.0rem' }}/>
       </IconButton>
-      <IconButton onClick={goToNext} sx={{ position: 'absolute', top: '50%', right: '10px', transform: 'translateY(-50%)' }}>
-      <ArrowForward sx={{ fontSize: '1.0rem' }}/>
+      <IconButton onClick={goToNext} sx={{ position: 'absolute', top: '50%', right: '3px', transform: 'translateY(-50%)' }}>
+      <ArrowForwardIos sx={{ fontSize: '1.0rem' }}/>
       </IconButton>
     </Box>
   );

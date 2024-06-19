@@ -61,6 +61,10 @@ const SignIn: React.FC = () => {
     navigate(`/cadastro`);
   };
 
+  const handleVoltar = () => {
+    navigate(`/`);
+  };
+
   const handleForgot = () => {
     navigate(`/redefinir-senha`);
   };
@@ -113,9 +117,17 @@ const SignIn: React.FC = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3}}
             >
               Entrar
+            </Button>
+            <Button
+              onClick={() => handleVoltar()}
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Voltar
             </Button>
             <Grid container>
               <Grid item xs>

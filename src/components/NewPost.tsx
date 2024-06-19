@@ -79,34 +79,40 @@ const NewPost: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const numericValue = parseFloat(product.price.replace(/\./g, '').replace(',', '.'));
-    const formattedValue = numericValue.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      try {
+        if (images.length <= 0) {
+          handleShowAlertError()
+          return;
+        }
 
-    const productToSubmit = {
-      ...product,
-      price: formattedValue
-    };
-    try {
-        const newPost = {
-            product: productToSubmit,
-            userId: getUserIdFromToken()
+        const numericValue = parseFloat(product.price.replace(/\./g, '').replace(',', '.'));
+        const formattedValue = numericValue.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+    
+        const productToSubmit = {
+          ...product,
+          price: formattedValue,
         };
-        const response = await axios.post(`${apiBaseUrl}/posts`, newPost,{
-          headers: {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
-      if (response.data.id) {
-        submitPictures(response.data.id)
+          const newPost = {
+              product: productToSubmit,
+              userId: getUserIdFromToken()
+          };
+          const response = await axios.post(`${apiBaseUrl}/posts`, newPost,{
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          });
+        if (response.data.id) {
+          await submitPictures(response.data.id)
+        }
+        setShowAlert(true);
+        setProduct(productInitialState);
+      } catch (error) {
+        handleShowAlertError();
+        console.log(error)
       }
-      setShowAlert(true);
-      setProduct(productInitialState);
-    } catch (error) {
-      handleShowAlertError();
-    }
   };
 
   const submitPictures = async (postId: number) => {

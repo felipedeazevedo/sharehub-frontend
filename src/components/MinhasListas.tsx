@@ -31,7 +31,7 @@ interface MaterialList {
   items: MaterialItem[];
 }
 
-const MaterialListTable: React.FC = () => {
+const MinhasListas: React.FC = () => {
   const navigate = useNavigate();
   const [materialLists, setMaterialLists] = useState<MaterialList[]>([]);
   const [showAlert, setShowAlert] = useState(false);
@@ -46,7 +46,7 @@ const MaterialListTable: React.FC = () => {
 
   const fetchMaterialLists = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/material-lists`, {
+      const response = await axios.get(`${apiBaseUrl}/material-lists/user/${getUserIdFromToken()}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -64,7 +64,7 @@ const MaterialListTable: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/listas-material/editar/${id}`);
+    navigate(`/material-lists/edit/${id}`);
   };
 
   const handleDelete = async (id: number | null | undefined) => {
@@ -136,7 +136,7 @@ const MaterialListTable: React.FC = () => {
               fontSize: 'clamp(3rem, 10vw, 3.5rem)',
             }}
           >
-            Listas de&nbsp;
+            Suas listas de&nbsp;
             <Typography
               component="span"
               variant="h1"
@@ -158,7 +158,7 @@ const MaterialListTable: React.FC = () => {
               width: { sm: '100%', md: '80%' },
             }}
           >
-            Explore listas disponibilizadas pelos próprios docentes do curso de medicina da Universidade Católica de Brasília
+            Aqui estão as listas disponibilizadas por você
           </Typography>
         </Stack>
           <TableContainer component={Paper} sx={{mt: 4}}>
@@ -183,14 +183,12 @@ const MaterialListTable: React.FC = () => {
                       <IconButton onClick={() => handleView(list.id)}>
                         <VisibilityIcon />
                       </IconButton>
-                      {(getUserTypeFromToken() === 'TEACHER' && list.teacher.id === getUserIdFromToken())  
-                      && <IconButton onClick={() => handleEdit(list.id)}>
+                      <IconButton onClick={() => handleEdit(list.id)}>
                         <EditIcon />
-                      </IconButton>}
-                      {(getUserTypeFromToken() === 'TEACHER' && list.teacher.id === getUserIdFromToken())  
-                      && <IconButton onClick={() => handleDeleteClickDeletion(list.id)}>
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteClickDeletion(list.id)}>
                         <DeleteIcon />
-                      </IconButton>}
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -227,4 +225,4 @@ const MaterialListTable: React.FC = () => {
   );
 };
 
-export default MaterialListTable;
+export default MinhasListas;
