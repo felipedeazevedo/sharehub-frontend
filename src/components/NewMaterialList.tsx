@@ -75,8 +75,6 @@ const NewMaterialList: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('MATERIAL LIST - ', materialList)
-
     try {
       const response = await axios.post(`${apiBaseUrl}/material-lists`, materialList, {
         headers: {
@@ -214,7 +212,7 @@ const NewMaterialList: React.FC = () => {
         TransitionComponent={Fade}
       >
         <Alert
-          onClose={() => navigate('/')}
+          onClose={() => navigate('/listas-material')}
           severity="success"
           variant="filled"
           sx={{ width: '100%' }}

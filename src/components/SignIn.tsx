@@ -13,6 +13,8 @@ import SharehubIcon from './SharehubIcon';
 import getLPTheme from '../getLPTheme';
 import { Alert, Fade, Snackbar } from '@mui/material';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const SignIn: React.FC = () => {
   const LPtheme = createTheme(getLPTheme('light'));
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ const SignIn: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/auth/login', {
+      const response = await fetch(`${apiBaseUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,15 +1,19 @@
 import React from 'react';
-import { Box, Button, Container, CssBaseline, FormControlLabel, Grid, Link, TextField, Typography, ThemeProvider, FormControl, FormLabel, RadioGroup, Radio } from '@mui/material';
+import { Box, Button, Container, CssBaseline, FormControlLabel, Grid, Link, TextField, Typography, ThemeProvider, FormControl, FormLabel, RadioGroup, Radio, Snackbar, Alert, Fade } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import getLPTheme from '../getLPTheme';
 import SharehubIcon from './SharehubIcon';
 import { useNavigate } from 'react-router-dom';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 function SignUp() {
   const LPtheme = createTheme(getLPTheme('light'));
   const [userType, setUserType] = React.useState('');
   const navigate = useNavigate();
-
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertSeverity, setAlertSeverity] = React.useState<'success' | 'error'>('success');
   const [registration, setRegistration] = React.useState('');
 
   const handleRegistrationChange = (event:any) => {
@@ -36,7 +40,7 @@ function SignUp() {
     };
   
     try {
-      const response = await fetch('http://localhost:3001/auth/register', {
+      const response = await fetch(`${apiBaseUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,13 +51,19 @@ function SignUp() {
       const responseData = await response.json();
   
       if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to register');
+        throw new Error(responseData.message || 'Falha ao registrar');
       }
   
       localStorage.setItem('accessToken', responseData.accessToken);
       navigate('/');
     } catch (error) {
-      console.error('Error registering:', error);
+      let errorMessage = 'Erro desconhecido ao registrar';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setAlertMessage(errorMessage);
+      setShowAlert(true);
+      setAlertSeverity('error');
     }
   };
 
@@ -163,6 +173,21 @@ function SignUp() {
           </Box>
         </Box>
       </Container>
+      <Snackbar
+        open={showAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={2000}
+        TransitionComponent={Fade}
+        onClose={() => setShowAlert(false)}
+      >
+        <Alert
+          severity={alertSeverity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

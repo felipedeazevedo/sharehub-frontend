@@ -79,13 +79,14 @@ const UserProfile: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`${apiBaseUrl}/users/${userId}`, user, {
+      const response = await axios.put(`${apiBaseUrl}/users/${userId}`, user, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
       setShowAlert(true);
       setEditable(false);
+      localStorage.setItem('accessToken', response.data.accessToken);
     } catch (error) {
       handleShowAlertError();
     }

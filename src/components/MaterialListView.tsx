@@ -41,7 +41,6 @@ const MaterialListView: React.FC = () => {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
-      console.log('RESPONSE - ', response)
       setMaterialList(response.data);
       setLoading(false);
     } catch (error) {
