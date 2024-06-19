@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid, Button, CssBaseline, ThemeProvider, createTheme, PaletteMode, Divider } from '@mui/material';
-import axios from 'axios';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { Box, Typography, Container, Paper, Grid, Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import getLPTheme from '../getLPTheme';
 import Footer from './Footer';
 import SellerInfoModal from './SellerInfoModal';
 import NavBar from './NavBar';
+import ProductSlideShow from './PicturesSlide';
+import { displayCondition } from './utils/displayCondition';
+import { displayCategory } from './utils/displayCategory';
 
 interface Product {
   id: number;
@@ -33,51 +35,11 @@ interface Post {
   user: User;
 }
 
-const fetchPostById = async (id: number): Promise<Post | null> => {
-  try {
-    const response = await axios.get(`http://localhost:3001/posts/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching post with id ${id}:`, error);
-    return null;
-  }
-};
-
-const fetchProductImages = async (postId: number): Promise<string[]> => {
-  try {
-    const response = await axios.get(`http://localhost:3001/pictures/${postId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching images for post ${postId}:`, error);
-    return [];
-  }
-};
-
 const ProductDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<Post | null>(null);
-  const [images, setImages] = useState<string[]>([]);
   const [selectedSeller, setSelectedSeller] = React.useState<User | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
-
-  useEffect(() => {
-    const getPost = async () => {
-      if (id) {
-        const postData = await fetchPostById(Number(id));
-        setPost(postData);
-
-        if (postData) {
-          const imagesData = await fetchProductImages(postData.id);
-          setImages(imagesData);
-        }
-      }
-    };
-    getPost();
-  }, [id]);
-
-  if (!post) {
-    return <Typography>Loading...</Typography>;
-  }
+  const location = useLocation();
+  const postProps = location.state.post;
 
   const handleOpenModal = (seller: User) => {
     setSelectedSeller(seller);
@@ -89,7 +51,6 @@ const ProductDetail: React.FC = () => {
     setSelectedSeller(null);
   };
 
-
   const LPtheme = createTheme(getLPTheme('light'));
 
   return (
@@ -100,32 +61,28 @@ const ProductDetail: React.FC = () => {
         <Paper sx={{ p: 4, mt: 20 }}>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              {images.map((image: any, index:any) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                  
-                </Box>
-              ))}
+              <ProductSlideShow images={postProps.images}/>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="h4" gutterBottom>
-                {post.product.title}
+                {postProps.product.title}
               </Typography>
               <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-                {post.product.description}
+                {postProps.product.description}
               </Typography>
               <Typography variant="h6" color="primary" gutterBottom>
-                Preço: R${post.product.price}
+                Preço: R${postProps.product.price}
               </Typography>
               <Typography variant="body2" gutterBottom>
-                Categoria: {post.product.category}
+                Categoria: {displayCategory(postProps.product.category)}
               </Typography>
               <Typography variant="body2" gutterBottom>
-                Condição: {post.product.condition}
+                Condição: {displayCondition(postProps.product.condition)}
               </Typography>
               <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                Anunciante: {post.user.name}
+                Anunciante: {postProps.user.name}
               </Typography>
-              <Button variant="contained" color="primary" onClick={() => handleOpenModal(post.user)}>
+              <Button variant="contained" color="primary" onClick={() => handleOpenModal(postProps.user)}>
                 Comprar agora
               </Button>
             </Grid>

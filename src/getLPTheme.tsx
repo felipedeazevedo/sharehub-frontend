@@ -297,7 +297,7 @@ export default function getLPTheme(mode: PaletteMode): ThemeOptions {
                   size: 'small',
                 },
                 style: {
-                  height: '2rem', // 32px
+                  height: '2rem', 
                   padding: '0 0.5rem',
                 },
               },
@@ -306,7 +306,7 @@ export default function getLPTheme(mode: PaletteMode): ThemeOptions {
                   size: 'medium',
                 },
                 style: {
-                  height: '2.5rem', // 40px
+                  height: '2.5rem', 
                 },
               },
               {

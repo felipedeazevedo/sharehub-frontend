@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import SharehubIcon from './SharehubIcon';
 import getLPTheme from '../getLPTheme';
+import { Alert, Fade, Snackbar } from '@mui/material';
 
 const SignIn: React.FC = () => {
   const LPtheme = createTheme(getLPTheme('light'));
   const navigate = useNavigate();
+  const [showAlertError, setShowAlertError] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -52,6 +50,7 @@ const SignIn: React.FC = () => {
       localStorage.setItem('accessToken', responseData.accessToken);
       navigate('/');
     } catch (error: any) {
+      handleShowAlertError();
       console.error('Error logging in:', error.message);
     }
   };
@@ -62,6 +61,13 @@ const SignIn: React.FC = () => {
 
   const handleForgot = () => {
     navigate(`/redefinir-senha`);
+  };
+
+  const handleShowAlertError = () => {
+    setShowAlertError(true);
+    setTimeout(() => {
+      setShowAlertError(false);
+    }, 2000);
   };
 
   return (
@@ -124,6 +130,21 @@ const SignIn: React.FC = () => {
           </Box>
         </Box>
       </Container>
+      <Snackbar 
+        open={showAlertError} 
+        anchorOrigin={{vertical: 'top',horizontal: 'center'}} 
+        autoHideDuration={2000} 
+        TransitionComponent={Fade}
+        onClose={() => setShowAlertError(false)}
+        >
+        <Alert
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          E-mail e/ou senha incorretos!
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };

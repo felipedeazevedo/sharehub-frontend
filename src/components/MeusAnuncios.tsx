@@ -1,15 +1,19 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Card, CardActions, CardContent } from '@mui/material';
+import { Card, CardActions, CardContent, CssBaseline, IconButton, ThemeProvider, createTheme } from '@mui/material';
 import axios from 'axios';
 import SellerInfoModal from './SellerInfoModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { displayCondition } from './utils/displayCondition';
 import ProductSlideShow from './PicturesSlide';
+import Footer from './Footer';
+import getLPTheme from '../getLPTheme';
+import NavBar from './NavBar';
+import { DeleteForever, Edit } from '@mui/icons-material';
+import DeletePostModal from './DeletePostModal';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -39,42 +43,51 @@ interface Post {
   user: User;
 }
 
-const fetchPosts = async () => {
-  const response = await axios.get(`${apiBaseUrl}/posts`);
-  return response.data;
-};
-
-const fetchProductImages = async (postId: number) => {
-  const response = await axios.get(`${apiBaseUrl}/posts/${postId}/pictures`);
-  return response.data;
-};
-
-export default function Home() {
+export default function MeusAnuncios() {
+  const { id: userId } = useParams<{ id: string }>();
   const [posts, setPosts] = React.useState([]);
   const [selectedSeller, setSelectedSeller] = React.useState<User | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [isModalOpenDeletion, setIsModalOpenDeletion] = React.useState(false);
   const navigate = useNavigate();
 
+  const fetchPosts = async () => {
+    const response = await axios.get(`${apiBaseUrl}/posts/user/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+    return response.data;
+  };
+  
+  const fetchProductImages = async (postId: number) => {
+    const response = await axios.get(`${apiBaseUrl}/posts/${postId}/pictures`);
+    return response.data;
+  };
+
+  const loadPosts = async () => {
+    const posts = await fetchPosts();
+
+    const postsWithImages: any = await Promise.all(
+      posts.map(async (post: any) => {
+        const images = await fetchProductImages(post.id);
+        return { ...post, images };
+      })
+    );
+
+    setPosts(postsWithImages);
+  };
+
   React.useEffect(() => {
-    const getPosts = async () => {
-      const posts = await fetchPosts();
-
-      const postsWithImages: any = await Promise.all(
-        posts.map(async (post: any) => {
-          const images = await fetchProductImages(post.id);
-          return { ...post, images };
-        })
-      );
-
-      setPosts(postsWithImages);
-    };
-
-    getPosts();
+    loadPosts()
   }, []);
 
-  const handleOpenModal = (seller: User) => {
-    setSelectedSeller(seller);
-    setModalOpen(true);
+  const handleDeleteClickDeletion = () => {
+    setIsModalOpenDeletion(true);
+  };
+
+  const handleCloseModalDeletion = () => {
+    setIsModalOpenDeletion(false);
   };
 
   const handleCloseModal = () => {
@@ -82,11 +95,31 @@ export default function Home() {
     setSelectedSeller(null);
   };
 
-  const handleViewMore = (post: any) => {
-    navigate(`/anuncio/${post.id}`, { state: { post } });
+  const handleEditPost = (post: any) => {
+    navigate(`/anuncio/${post.id}/editar`, { state: { post } });
   };
 
+  const handleConfirmDeletion = async (id: number) => {
+    try {
+      const response = await axios.delete(`${apiBaseUrl}/posts/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao conectar com a API', error);
+    } finally {
+      setIsModalOpenDeletion(false);
+      await loadPosts();
+    }
+  };
+
+  const LPtheme = createTheme(getLPTheme('light'));
+
   return (
+    <ThemeProvider theme={LPtheme}>
+    <CssBaseline />
+    <NavBar/>
     <Box
       id="home"
       sx={(theme) => ({
@@ -123,7 +156,7 @@ export default function Home() {
               fontSize: 'clamp(3rem, 10vw, 3.5rem)',
             }}
           >
-            Equipamentos&nbsp;
+            Seus&nbsp;
             <Typography
               component="span"
               variant="h1"
@@ -135,7 +168,7 @@ export default function Home() {
                 }),
               })}
             >
-              anunciados
+              anúncios
             </Typography>
           </Typography>
           <Typography
@@ -145,7 +178,7 @@ export default function Home() {
               width: { sm: '100%', md: '80%' },
             }}
           >
-            Explore equipamentos anunciados pelos próprios alunos do curso de medicina da Universidade Católica de Brasília
+            Aqui estão os equipamentos anunciados por você.
           </Typography>
         </Stack>
         <Box
@@ -171,10 +204,15 @@ export default function Home() {
                   {displayCondition(post.product.condition)}
                 </Typography>
               </CardContent>
-              <CardActions>
-                <Button size="small" onClick={() => handleViewMore(post)}>Ver mais</Button>
-                <Button size="small" onClick={() => handleOpenModal(post.user)}>Comprar</Button>
+              <CardActions sx={{justifyContent: 'right'}}>
+                <IconButton size="small" onClick={() => handleEditPost(post)}>
+                  <Edit />
+                </IconButton>
+                <IconButton size="small" onClick={() => handleDeleteClickDeletion()}>
+                  <DeleteForever />
+                </IconButton>
               </CardActions>
+              <DeletePostModal open={isModalOpenDeletion} onClose={handleCloseModalDeletion} onConfirm={() => handleConfirmDeletion(post.id)}/>
             </Card>
           ))}
           {posts.length === 0 && 
@@ -198,5 +236,9 @@ export default function Home() {
         />
       )}
     </Box>
+    <Box sx={{ bgcolor: 'background.default' }}>
+      <Footer />
+    </Box>
+  </ThemeProvider>
   );
 }

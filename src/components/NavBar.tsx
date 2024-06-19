@@ -12,14 +12,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SharehubIcon from './SharehubIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-interface NavBarProps {
-}
+import { getUserIdFromToken, getUserNameFromToken, isUserLoggedIn } from './utils/getToken';
+import { Menu } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
 
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [userMenuAnchor, setUserMenuAnchor] = React.useState<null | HTMLElement>(null);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -47,8 +48,33 @@ export default function NavBar() {
     navigate(`/login`);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate(`/`);
+  };
+
+  const handleMeusAnuncios = (userId: number | null) => {
+    navigate(`/anuncios/usuario/${userId}`);
+  };
+
   const handleAnunciar = () => {
-    navigate(`/anunciar`);
+    if (!isUserLoggedIn()) {
+      navigate(`/login`);
+    } else {
+      navigate(`/anunciar`);
+    }
+  };
+
+  const handleViewUser = (userId: number | null) => {
+    navigate(`/cadastro/${userId}`);
+  };
+
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
   };
 
   return (
@@ -107,12 +133,29 @@ export default function NavBar() {
               alignItems: 'center',
             }}
           >
-            <Button color="primary" variant="text" size="small" onClick={() => handleLogin()}>
+            {!isUserLoggedIn() && <Button color="primary" variant="text" size="small" onClick={() => handleLogin()}>
               Acessar conta
-            </Button>
+            </Button>}
             <Button color="primary" variant="contained" size="small" onClick={() => handleAnunciar()}>
               Anunciar
             </Button>
+            {isUserLoggedIn() && <MenuItem>
+                  <Button color="primary" variant="text" fullWidth sx={{ border: '1px solid' }} onClick={handleUserMenuOpen}>
+                  {getUserNameFromToken()}
+                  <KeyboardArrowDown />
+                  </Button>
+                  <Menu
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    anchorEl={userMenuAnchor}
+                    open={Boolean(userMenuAnchor)}
+                    onClose={handleUserMenuClose}
+                  >
+                    <MenuItem onClick={() => handleViewUser(getUserIdFromToken())}>Meu cadastro</MenuItem>
+                    <MenuItem onClick={() => handleMeusAnuncios(getUserIdFromToken())}>Meus anúncios</MenuItem>
+                    <MenuItem onClick={() => handleLogout()}>Sair</MenuItem>
+                  </Menu>
+            </MenuItem>}
           </Box>
           <Box sx={{ display: { sm: 'flex', md: 'none' } }}>
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>

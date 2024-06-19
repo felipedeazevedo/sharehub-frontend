@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
 import 'react-toastify/dist/ReactToastify.css';
 import { NumericFormat } from 'react-number-format';
+import ImageUploader from './ImageUploader';
+
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 interface NewProduct {
   title: string;
@@ -37,6 +40,8 @@ const NewPost: React.FC = () => {
   const [product, setProduct] = useState<NewProduct>(productInitialState);
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertError, setShowAlertError] = useState(false);
+  const [showAlertErrorPictures, setShowAlertErrorPictures] = useState(false);
+  const [images, setImages] = useState<File[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,8 +78,13 @@ const NewPost: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const numericValue = parseFloat(product.price.replace(/\./g, '').replace(',', '.'));
-    const formattedValue = numericValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formattedValue = numericValue.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
     const productToSubmit = {
       ...product,
       price: formattedValue
@@ -84,26 +94,55 @@ const NewPost: React.FC = () => {
             product: productToSubmit,
             userId: getUserIdFromToken()
         };
-        const response = await axios.post('http://localhost:3001/posts', newPost,{
+        const response = await axios.post(`${apiBaseUrl}/posts`, newPost,{
           headers: {
               'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
         });
-      /*if (response.data.id) {
-        const picturesResponse = await axios.post(`http://localhost:3001/posts/${response.data.id}/pictures`, 
-          newPost, 
-          {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            }
-          });
-      }*/
+      if (response.data.id) {
+        submitPictures(response.data.id)
+      }
       setShowAlert(true);
       setProduct(productInitialState);
     } catch (error) {
-      setShowAlertError(true);
-      console.error('Erro ao criar anúncio:', error);
+      handleShowAlertError();
     }
+  };
+
+  const submitPictures = async (postId: number) => {
+    try {
+      const formData = new FormData();
+      images.forEach((image, index) => {
+        formData.append('pictures', image);
+      });
+
+      const pictures_reponse = await axios.post(`${apiBaseUrl}/posts/${postId}/pictures`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+      });
+    } catch (error) {
+      handleShowAlertErrorPictures()
+    }
+  }
+
+  const handleShowAlertError = () => {
+    setShowAlertError(true);
+    setTimeout(() => {
+      setShowAlertError(false);
+    }, 2000);
+  };
+
+  const handleShowAlertErrorPictures = () => {
+    setShowAlertErrorPictures(true);
+    setTimeout(() => {
+      setShowAlertErrorPictures(false);
+    }, 2000);
+  };
+
+  const handleImageChange = (selectedFiles: File[]) => {
+    setImages(selectedFiles);
   };
 
   const LPtheme = createTheme(getLPTheme('light'));
@@ -223,6 +262,7 @@ const NewPost: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
+                <ImageUploader onChange={handleImageChange}/>
                 <Grid container marginTop={4} xs={12} justifyContent="flex-end">
                   <Button type="submit" variant="contained" color="primary">
                     Anunciar
@@ -255,6 +295,7 @@ const NewPost: React.FC = () => {
         anchorOrigin={{vertical: 'top',horizontal: 'center'}} 
         autoHideDuration={2000} 
         TransitionComponent={Fade}
+        onClose={() => setShowAlertError(false)}
         >
         <Alert
           severity="error"
@@ -262,6 +303,21 @@ const NewPost: React.FC = () => {
           sx={{ width: '100%' }}
         >
           Erro ao criar anúncio!
+        </Alert>
+      </Snackbar>
+      <Snackbar 
+        open={showAlertErrorPictures} 
+        anchorOrigin={{vertical: 'top',horizontal: 'center'}} 
+        autoHideDuration={2000} 
+        TransitionComponent={Fade}
+        onClose={() => setShowAlertErrorPictures(false)}
+        >
+        <Alert
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          Erro ao salvar imagens do anúncio!
         </Alert>
       </Snackbar>
     </ThemeProvider>

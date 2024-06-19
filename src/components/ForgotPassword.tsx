@@ -17,6 +17,8 @@ import SharehubIcon from './SharehubIcon';
 import getLPTheme from '../getLPTheme';
 import { toast } from 'react-toastify';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const ForgotPassword: React.FC = () => {
   const LPtheme = createTheme(getLPTheme('light'));
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ const ForgotPassword: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/auth/forget-password', {
+      const response = await fetch(`${apiBaseUrl}/auth/forget-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

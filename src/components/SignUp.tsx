@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Box, Button, Checkbox, Container, CssBaseline, FormControlLabel, Grid, Link, TextField, Typography, ThemeProvider, FormControl, FormLabel, RadioGroup, Radio } from '@mui/material';
+import { Box, Button, Container, CssBaseline, FormControlLabel, Grid, Link, TextField, Typography, ThemeProvider, FormControl, FormLabel, RadioGroup, Radio } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import getLPTheme from '../getLPTheme';
 import SharehubIcon from './SharehubIcon';
@@ -52,7 +52,6 @@ function SignUp() {
   
       localStorage.setItem('accessToken', responseData.accessToken);
       navigate('/');
-      console.log('Registered successfully');
     } catch (error) {
       console.error('Error registering:', error);
     }
@@ -100,8 +99,8 @@ function SignUp() {
                   name="registration"
                   autoComplete="family-name"
                   onChange={handleRegistrationChange}
-                  inputProps={{ maxLength: 10 }} // Define o tamanho máximo do input para 10 caracteres
-                  error={!/^UC\d{8}$/.test(registration)} // Define como erro se não seguir o padrão UCxxxxxxxx
+                  inputProps={{ maxLength: 10 }} 
+                  error={!/^UC\d{8}$/.test(registration)} 
                   helperText={registration && !/^UC\d{8}$/.test(registration) ? 'Formato incorreto. Exemplo: UC12345678' : ''}
                 />
               </Grid>
@@ -134,7 +133,7 @@ function SignUp() {
                 label="Telefone"
                 id="phone"
                 autoComplete="tel"
-                inputProps={{ pattern: "[0-9]*" }}
+                inputProps={{ maxLength: 11, pattern: "[0-9]*" }}
                 />
               </Grid>
               <Grid item spacing={2} xs={12}>
