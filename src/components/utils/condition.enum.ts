@@ -1,6 +1,6 @@
 export enum ProductCondition {
-    USED = 'Novo',
-    NEW = 'Usado',
+    USED = 'Usado',
+    NEW = 'Novo',
     PARTIALLY_FUNCTIONAL = 'Parcialmente funcional',
   }
   
