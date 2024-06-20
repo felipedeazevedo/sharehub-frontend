@@ -48,7 +48,6 @@ const EditMaterialList: React.FC = () => {
           }
         });
 
-        // Ajustando o teacherId a partir da resposta da API
         const fetchedMaterialList = {
             ...response.data,
             teacherId: response.data.teacher?.id || null
@@ -147,7 +146,7 @@ const EditMaterialList: React.FC = () => {
             Editar Lista de Material
           </Typography>
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
+            <Grid container item spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required

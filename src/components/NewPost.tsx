@@ -85,18 +85,8 @@ const NewPost: React.FC = () => {
           return;
         }
 
-        const numericValue = parseFloat(product.price.replace(/\./g, '').replace(',', '.'));
-        const formattedValue = numericValue.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          });
-    
-        const productToSubmit = {
-          ...product,
-          price: formattedValue,
-        };
           const newPost = {
-              product: productToSubmit,
+              product: product,
               userId: getUserIdFromToken()
           };
           const response = await axios.post(`${apiBaseUrl}/posts`, newPost,{

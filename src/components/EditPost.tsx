@@ -92,15 +92,9 @@ const EditPost: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const numericValue = parseFloat(product.price.replace(/\./g, '').replace(',', '.'));
-    const formattedValue = numericValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const productToSubmit = {
-      ...product,
-      price: formattedValue
-    };
     try {
         const post = {
-            product: productToSubmit,
+            product: product,
             userId: getUserIdFromToken()
         };
         const response = await axios.put(`${apiBaseUrl}/posts/${postProps.id}`, post,{
